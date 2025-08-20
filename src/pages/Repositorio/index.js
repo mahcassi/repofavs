@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import {Container, Owner, Loading, BackButton, IssuesList} from './styles';
+import { Container, Owner, Loading, BackButton, IssuesList, PageActions } from './styles';
 import { useEffect, useState } from 'react';
 import { FaArrowLeft } from 'react-icons/fa';
 import api from '../../services/api';
@@ -9,6 +9,7 @@ export default function Repositorio() {
     const [repositorio, setRepositorio] = useState({});
     const [issues, setIssues] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(1);
 
     useEffect(() => {
         async function load() {
@@ -19,7 +20,7 @@ export default function Repositorio() {
                 api.get(`/repos/${nomeRepo}/issues`, {
                     params: {
                         state: 'open',
-                        per_page: 5
+                        per_page: 5,
                     }
                 })
             ]);
@@ -30,7 +31,33 @@ export default function Repositorio() {
         }
 
         load();
-    }, []);
+    }, [repo]);
+
+
+    useEffect(() => {
+
+        async function loadIssue() {
+            const nomeRepo = decodeURIComponent(repo);
+
+            const response = await api.get(`/repos/${nomeRepo}/issues`, {
+                params: {
+                    state: 'open',
+                    page,
+                    per_page: 5,
+                },
+            });
+
+            setIssues(response.data);
+
+        }
+
+        loadIssue();
+
+    }, [repo, page]);
+
+    function handlePage(action) {
+        setPage(action === 'back' ? page - 1 : page + 1)
+    }
 
 
     if (loading) {
@@ -43,43 +70,58 @@ export default function Repositorio() {
 
 
     return (
-       <Container>
-        <BackButton to="/">
-          <FaArrowLeft color="#000" size={30} />
-        </BackButton>
+        <Container>
+            <BackButton to="/">
+                <FaArrowLeft color="#000" size={30} />
+            </BackButton>
 
-        <Owner>
-          <img 
-          src={repositorio.owner.avatar_url} 
-          alt={repositorio.owner.login} 
-          />
-          <h1>{repositorio.name}</h1>
-          <p>{repositorio.description}</p>
-        </Owner>
+            <Owner>
+                <img
+                    src={repositorio.owner.avatar_url}
+                    alt={repositorio.owner.login}
+                />
+                <h1>{repositorio.name}</h1>
+                <p>{repositorio.description}</p>
+            </Owner>
 
-        <IssuesList>
-          {issues.map(issue => (
-            <li key={String(issue.id)}>
-              <img src={issue.user.avatar_url} alt={issue.user.login} />
+            <IssuesList>
+                {issues.map(issue => (
+                    <li key={String(issue.id)}>
+                        <img src={issue.user.avatar_url} alt={issue.user.login} />
 
-              <div>
-                <strong>
-                  <a href={issue.html_url}>{issue.title}</a>
+                        <div>
+                            <strong>
+                                <a href={issue.html_url}>{issue.title}</a>
 
-                  {issue.labels.map(label => (
-                    <span key={String(label.id)}>{label.name}</span>
-                  ))}
+                                {issue.labels.map(label => (
+                                    <span key={String(label.id)}>{label.name}</span>
+                                ))}
 
-                </strong>
+                            </strong>
 
-                <p>{issue.user.login}</p>
+                            <p>{issue.user.login}</p>
 
-              </div>
+                        </div>
 
-            </li>
-          ))}
-        </IssuesList>
+                    </li>
+                ))}
+            </IssuesList>
 
-    </Container>
+
+            <PageActions>
+                <button
+                    type="button"
+                    onClick={() => handlePage('back')}
+                    disabled={page < 2}
+                >
+                    Voltar
+                </button>
+
+                <button type="button" onClick={() => handlePage('next')}>
+                    Proxima
+                </button>
+            </PageActions>
+
+        </Container>
     );
 }
