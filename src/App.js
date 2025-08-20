@@ -1,4 +1,3 @@
-import './styles.css'
 import Router from './route';
 import GlovbalStyle from './styles/global';
 
