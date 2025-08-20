@@ -1,10 +1,13 @@
 import './styles.css'
+import Router from './route';
+import GlovbalStyle from './styles/global';
 
 function App() {
   return (
-    <div>
-      <h1>Meu projeto</h1>
-    </div>
+    <>
+      <GlovbalStyle />
+      <Router />
+    </>
   )
 }
 

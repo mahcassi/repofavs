@@ -1,17 +1,15 @@
-import { BrowserRouter, Route, Routes, Switch } from 'react-router-dom';
-import Home from './pages/Home';
-import Sobre from './pages/Sobre';
-import Contato from './pages/Contato';
-import Header from './components/Header';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Main from './pages/Main';
+import Repositorio from './pages/Repositorio';
+
+
 
 const Router = () => {
     return (
         <BrowserRouter>
-            <Header />
             <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/sobre" element={<Sobre />} />
-                <Route path="/contato" element={<Contato />} />
+                <Route exact path="/" element={<Main />} />
+                <Route exact path="/repositorio/:repo" element={<Repositorio />} />
             </Routes>
 
         </BrowserRouter>
